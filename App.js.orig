@@ -1,0 +1,77 @@
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ *
+ * @format
+ * @flow
+ * @lint-ignore-every XPLATJSCOPYRIGHT1
+ */
+
+import React, { Component } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import { WebView } from "react-native-webview";
+import qs from 'qs';
+
+const isLogin = `
+    (function() { 
+        return document.querySelector("h1").innerHTML === "My Account" 
+    })()
+`;
+
+export default class App extends Component {
+
+    _onNavigationStateChange = (event) => {
+        console.log('-- _onNavigationStateChange --');
+        console.log(event);
+    }
+
+    render() {
+
+        /*
+        let sourceObj = {
+            uri: 'https://testwebview.free.beeceptor.com/post',
+            method: 'POST'
+        };
+        */
+
+        let header = {
+            //'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        };
+
+        let email = 'gary@arkade.com.au';
+        let password = 'test1234';
+        let loginUrl = 'https://rendrtrade.myshopify.com/account/login';
+
+        let loginObj = {
+            "form_type": "customer_login",
+            "customer[email]": email,
+            "customer[password]": password
+        };
+
+        let loginStr = qs.stringify(loginObj);
+
+        const sourceObj = {
+            uri: loginUrl,
+            headers: header,
+            body: loginStr,
+            method:'POST'
+        };
+
+        return (
+            <WebView
+                source={sourceObj}
+                style={{ marginTop: 20 }}
+                onLoadProgress={e => console.log(e.nativeEvent.progress)}
+
+                ref={node => { this.webView = node; }}
+
+                injectedJavaScript={
+                    isLogin
+                }
+
+                onNavigationStateChange={this._onNavigationStateChange}
+            />
+        );
+    }
+}
